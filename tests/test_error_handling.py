@@ -229,7 +229,7 @@ class TestCLIErrorHandling:
         result = self.runner.invoke(cli, ['setup'], input='1500.0\nn\n2.50\n0\n')
         
         assert result.exit_code == 0
-        assert "Rate $1500.00 seems very high" in result.output
+        assert "Rate ₹1500.00 seems very high" in result.output
         assert "Account setup completed successfully!" in result.output
         mock_tm.setup_account.assert_called_once_with(2.50, 0.0)
     
@@ -244,7 +244,7 @@ class TestCLIErrorHandling:
         result = self.runner.invoke(cli, ['setup'], input='2.50\n150000\ny\n')
         
         assert result.exit_code == 0
-        assert "Balance $150000.00 seems very large" in result.output
+        assert "Balance ₹150000.00 seems very large" in result.output
         assert "Account setup completed successfully!" in result.output
         mock_tm.setup_account.assert_called_once_with(2.50, 150000.0)
     
@@ -298,7 +298,7 @@ class TestCLIErrorHandling:
         result = self.runner.invoke(cli, ['add-transaction'], input='5\n-10.0\ny\n')
         
         assert result.exit_code == 0
-        assert "Negative payment ($10.00 refund)" in result.output
+        assert "Negative payment (₹10.00 refund)" in result.output
         assert "Transaction recorded successfully!" in result.output
         mock_tm.add_transaction.assert_called_once_with(5, -10.0)
     
@@ -341,7 +341,7 @@ class TestErrorRecovery:
         result = self.runner.invoke(cli, ['balance', '--detailed'])
         
         assert result.exit_code == 0
-        assert "Current balance: $15.00 (you owe)" in result.output
+        assert "Current balance: ₹15.00 (you owe)" in result.output
         assert "Could not retrieve transaction history" in result.output
     
     @patch('saldo.cli.TransactionManager')

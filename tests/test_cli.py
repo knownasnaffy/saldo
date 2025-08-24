@@ -44,8 +44,8 @@ class TestSetupCommand:
         # Verify success
         assert result.exit_code == 0
         assert "Account setup completed successfully!" in result.output
-        assert "Rate per item: $2.50" in result.output
-        assert "$10.00 (you owe)" in result.output
+        assert "Rate per item: ₹2.50" in result.output
+        assert "₹10.00 (you owe)" in result.output
         
         # Verify TransactionManager was called correctly
         mock_tm.setup_account.assert_called_once_with(2.50, 10.00)
@@ -64,8 +64,8 @@ class TestSetupCommand:
         # Verify success
         assert result.exit_code == 0
         assert "Account setup completed successfully!" in result.output
-        assert "Rate per item: $2.50" in result.output
-        assert "$5.00 (you have credit)" in result.output
+        assert "Rate per item: ₹2.50" in result.output
+        assert "₹5.00 (you have credit)" in result.output
         
         # Verify TransactionManager was called correctly
         mock_tm.setup_account.assert_called_once_with(2.50, -5.00)
@@ -83,8 +83,8 @@ class TestSetupCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "Rate per item: $3.00" in result.output
-        assert "$0.00 (starting fresh)" in result.output
+        assert "Rate per item: ₹3.00" in result.output
+        assert "₹0.00 (starting fresh)" in result.output
         
         mock_tm.setup_account.assert_called_once_with(3.00, 0.0)
     
@@ -101,8 +101,8 @@ class TestSetupCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "Rate per item: $2.00" in result.output
-        assert "$0.00 (starting fresh)" in result.output
+        assert "Rate per item: ₹2.00" in result.output
+        assert "₹0.00 (starting fresh)" in result.output
         
         mock_tm.setup_account.assert_called_once_with(2.00, 0.0)
     
@@ -190,8 +190,8 @@ class TestSetupCommand:
         # Verify success
         assert result.exit_code == 0
         assert "Configuration already exists!" in result.output
-        assert "Current rate: $2.00 per item" in result.output
-        assert "Initial balance: $5.00" in result.output
+        assert "Current rate: ₹2.00 per item" in result.output
+        assert "Initial balance: ₹5.00" in result.output
         assert "Account setup completed successfully!" in result.output
         
         mock_tm.setup_account.assert_called_once_with(3.00, 0.0)
@@ -349,10 +349,10 @@ class TestAddTransactionCommand:
         assert result.exit_code == 0
         assert "Transaction recorded successfully!" in result.output
         assert "Items processed: 5" in result.output
-        assert "Total cost: $12.50" in result.output
-        assert "Payment received: $15.00" in result.output
-        assert "New balance: $2.50 (you owe)" in result.output
-        assert "Overpayment: $2.50 (applied as credit)" in result.output
+        assert "Total cost: ₹12.50" in result.output
+        assert "Payment received: ₹15.00" in result.output
+        assert "New balance: ₹2.50 (you owe)" in result.output
+        assert "Overpayment: ₹2.50 (applied as credit)" in result.output
         
         # Verify TransactionManager was called correctly
         mock_tm.add_transaction.assert_called_once_with(5, 15.00)
@@ -384,8 +384,8 @@ class TestAddTransactionCommand:
         assert result.exit_code == 0
         assert "Transaction recorded successfully!" in result.output
         assert "Items processed: 3" in result.output
-        assert "Total cost: $9.00" in result.output
-        assert "New balance: $1.00 (you have credit)" in result.output
+        assert "Total cost: ₹9.00" in result.output
+        assert "New balance: ₹1.00 (you have credit)" in result.output
         
         mock_tm.add_transaction.assert_called_once_with(3, 10.00)
     
@@ -414,7 +414,7 @@ class TestAddTransactionCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "New balance: $0.00 (all settled)" in result.output
+        assert "New balance: ₹0.00 (all settled)" in result.output
         
         mock_tm.add_transaction.assert_called_once_with(5, 10.00)
     
@@ -443,8 +443,8 @@ class TestAddTransactionCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "New balance: $7.00 (you owe)" in result.output
-        assert "Underpayment: $2.00 (added to balance)" in result.output
+        assert "New balance: ₹7.00 (you owe)" in result.output
+        assert "Underpayment: ₹2.00 (added to balance)" in result.output
         
         mock_tm.add_transaction.assert_called_once_with(5, 8.00)
     
@@ -610,8 +610,8 @@ class TestBalanceCommand:
         # Verify success
         assert result.exit_code == 0
         assert "Saldo Balance Summary" in result.output
-        assert "Rate per item: $2.50" in result.output
-        assert "Current balance: $15.75 (you owe)" in result.output
+        assert "Rate per item: ₹2.50" in result.output
+        assert "Current balance: ₹15.75 (you owe)" in result.output
         assert "You have an outstanding balance to pay." in result.output
         assert "Use 'saldo balance --detailed' to see transaction history." in result.output
     
@@ -632,8 +632,8 @@ class TestBalanceCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "Rate per item: $3.00" in result.output
-        assert "Current balance: $5.50 (you have credit)" in result.output
+        assert "Rate per item: ₹3.00" in result.output
+        assert "Current balance: ₹5.50 (you have credit)" in result.output
         assert "You have credit available for future transactions." in result.output
     
     @patch('saldo.cli.TransactionManager')
@@ -653,8 +653,8 @@ class TestBalanceCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "Rate per item: $2.00" in result.output
-        assert "Current balance: $0.00 (all settled)" in result.output
+        assert "Rate per item: ₹2.00" in result.output
+        assert "Current balance: ₹0.00 (all settled)" in result.output
         assert "Your account is fully settled." in result.output
     
     @patch('saldo.cli.TransactionManager')
@@ -692,13 +692,13 @@ class TestBalanceCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "Current balance: $7.50 (you owe)" in result.output
+        assert "Current balance: ₹7.50 (you owe)" in result.output
         assert "Recent Transactions (last 2):" in result.output
         assert "2024-01-15" in result.output
         assert "2024-01-10" in result.output
         assert "Total items processed: 5" in result.output
-        assert "Total cost: $12.50" in result.output
-        assert "Total payments: $15.00" in result.output
+        assert "Total cost: ₹12.50" in result.output
+        assert "Total payments: ₹15.00" in result.output
         
         # Verify get_transactions was called with default limit
         mock_tm.db_manager.get_transactions.assert_called_once_with(limit=10)
@@ -743,7 +743,7 @@ class TestBalanceCommand:
         
         # Verify success
         assert result.exit_code == 0
-        assert "Current balance: $10.00 (you owe)" in result.output
+        assert "Current balance: ₹10.00 (you owe)" in result.output
         assert "No transactions found." in result.output
         assert "Use 'saldo add-transaction' to record your first transaction." in result.output
     
@@ -795,7 +795,7 @@ class TestBalanceCommand:
         
         # Verify partial success with error message
         assert result.exit_code == 0
-        assert "Current balance: $5.00 (you owe)" in result.output
+        assert "Current balance: ₹5.00 (you owe)" in result.output
         assert "Could not retrieve transaction history: Transaction query failed" in result.output
     
     @patch('saldo.cli.TransactionManager')

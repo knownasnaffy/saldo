@@ -40,8 +40,8 @@ def setup(rate: Optional[float], balance: Optional[float]):
             existing_config = transaction_manager.db_manager.get_configuration()
             if existing_config:
                 click.echo("⚠️  Configuration already exists!")
-                click.echo(f"Current rate: ${existing_config['rate_per_item']:.2f} per item")
-                click.echo(f"Initial balance: ${existing_config['initial_balance']:.2f}")
+                click.echo(f"Current rate: ₹{existing_config['rate_per_item']:.2f} per item")
+                click.echo(f"Initial balance: ₹{existing_config['initial_balance']:.2f}")
                 
                 if not click.confirm("Do you want to overwrite the existing configuration?"):
                     click.echo("Setup cancelled.")
@@ -73,7 +73,7 @@ def setup(rate: Optional[float], balance: Optional[float]):
                     
                     # Check for unusually high rates
                     if rate > 1000:
-                        if not click.confirm(f"⚠️  Rate ${rate:.2f} seems very high. Are you sure this is correct?"):
+                        if not click.confirm(f"⚠️  Rate ₹{rate:.2f} seems very high. Are you sure this is correct?"):
                             continue
                     
                     break
@@ -105,7 +105,7 @@ def setup(rate: Optional[float], balance: Optional[float]):
                     
                     # Check for unusually large balances
                     if abs(balance) > 100000:
-                        if not click.confirm(f"⚠️  Balance ${abs(balance):.2f} seems very large. Are you sure this is correct?"):
+                        if not click.confirm(f"⚠️  Balance ₹{abs(balance):.2f} seems very large. Are you sure this is correct?"):
                             continue
                     
                     break
@@ -118,14 +118,14 @@ def setup(rate: Optional[float], balance: Optional[float]):
         
         # Display success message
         click.echo("✅ Account setup completed successfully!")
-        click.echo(f"Rate per item: ${rate:.2f}")
+        click.echo(f"Rate per item: ₹{rate:.2f}")
         
         if balance > 0:
-            click.echo(f"Initial balance: ${balance:.2f} (you owe)")
+            click.echo(f"Initial balance: ₹{balance:.2f} (you owe)")
         elif balance < 0:
-            click.echo(f"Initial balance: ${abs(balance):.2f} (you have credit)")
+            click.echo(f"Initial balance: ₹{abs(balance):.2f} (you have credit)")
         else:
-            click.echo("Initial balance: $0.00 (starting fresh)")
+            click.echo("Initial balance: ₹0.00 (starting fresh)")
         
         click.echo("\nYou can now use 'saldo add-transaction' to record transactions.")
         
@@ -219,17 +219,17 @@ def add_transaction(items: Optional[int], payment: Optional[float]):
         
         click.echo(f"\n📊 Transaction Summary:")
         click.echo(f"Items processed: {items}")
-        click.echo(f"Cost per item: ${rate:.2f}")
-        click.echo(f"Total cost: ${cost:.2f}")
-        click.echo(f"Previous balance: ${current_balance:.2f}")
-        click.echo(f"Total amount due: ${total_due:.2f}")
+        click.echo(f"Cost per item: ₹{rate:.2f}")
+        click.echo(f"Total cost: ₹{cost:.2f}")
+        click.echo(f"Previous balance: ₹{current_balance:.2f}")
+        click.echo(f"Total amount due: ₹{total_due:.2f}")
         
         # Get payment amount from user if not provided
         if payment is None:
             while True:
                 try:
                     payment_input = click.prompt(
-                        f"Enter payment amount (total due: ${total_due:.2f})",
+                        f"Enter payment amount (total due: ₹{total_due:.2f})",
                         type=str
                     )
                     payment_input = payment_input.strip()
@@ -243,12 +243,12 @@ def add_transaction(items: Optional[int], payment: Optional[float]):
                     
                     # Check for unusually large payments
                     if abs(payment) > 100000:
-                        if not click.confirm(f"⚠️  Payment amount ${abs(payment):.2f} seems very large. Are you sure this is correct?"):
+                        if not click.confirm(f"⚠️  Payment amount ₹{abs(payment):.2f} seems very large. Are you sure this is correct?"):
                             continue
                     
                     # Warn about negative payments (refunds)
                     if payment < 0:
-                        if not click.confirm(f"⚠️  Negative payment (${abs(payment):.2f} refund). Is this correct?"):
+                        if not click.confirm(f"⚠️  Negative payment (₹{abs(payment):.2f} refund). Is this correct?"):
                             continue
                     
                     break
@@ -262,21 +262,21 @@ def add_transaction(items: Optional[int], payment: Optional[float]):
         # Display results
         new_balance = transaction_result['balance_after']
         click.echo(f"\n✅ Transaction recorded successfully!")
-        click.echo(f"Payment received: ${payment:.2f}")
+        click.echo(f"Payment received: ₹{payment:.2f}")
         
         if new_balance > 0:
-            click.echo(f"New balance: ${new_balance:.2f} (you owe)")
+            click.echo(f"New balance: ₹{new_balance:.2f} (you owe)")
         elif new_balance < 0:
-            click.echo(f"New balance: ${abs(new_balance):.2f} (you have credit)")
+            click.echo(f"New balance: ₹{abs(new_balance):.2f} (you have credit)")
         else:
-            click.echo("New balance: $0.00 (all settled)")
+            click.echo("New balance: ₹0.00 (all settled)")
         
         # Show change information
         change = payment - cost
         if change > 0:
-            click.echo(f"Overpayment: ${change:.2f} (applied as credit)")
+            click.echo(f"Overpayment: ₹{change:.2f} (applied as credit)")
         elif change < 0:
-            click.echo(f"Underpayment: ${abs(change):.2f} (added to balance)")
+            click.echo(f"Underpayment: ₹{abs(change):.2f} (added to balance)")
         
     except ValidationError as e:
         click.echo(f"❌ Validation Error: {e}", err=True)
@@ -333,17 +333,17 @@ def balance(detailed: bool, limit: int):
         click.echo("=" * 25)
         
         # Display rate information
-        click.echo(f"Rate per item: ${rate:.2f}")
+        click.echo(f"Rate per item: ₹{rate:.2f}")
         
         # Display balance with clear indication of direction
         if current_balance > 0:
-            click.echo(f"Current balance: ${current_balance:.2f} (you owe)")
+            click.echo(f"Current balance: ₹{current_balance:.2f} (you owe)")
             click.echo("💳 You have an outstanding balance to pay.")
         elif current_balance < 0:
-            click.echo(f"Current balance: ${abs(current_balance):.2f} (you have credit)")
+            click.echo(f"Current balance: ₹{abs(current_balance):.2f} (you have credit)")
             click.echo("✨ You have credit available for future transactions.")
         else:
-            click.echo("Current balance: $0.00 (all settled)")
+            click.echo("Current balance: ₹0.00 (all settled)")
             click.echo("✅ Your account is fully settled.")
         
         # Show detailed transaction history if requested
@@ -365,7 +365,7 @@ def balance(detailed: bool, limit: int):
                         payment = transaction['payment']
                         balance = transaction['balance_after']
                         
-                        click.echo(f"{date_str:<12} {items:<6} ${cost:<7.2f} ${payment:<7.2f} ${balance:<9.2f}")
+                        click.echo(f"{date_str:<12} {items:<6} ₹{cost:<7.2f} ₹{payment:<7.2f} ₹{balance:<9.2f}")
                     
                     click.echo("-" * 70)
                     
@@ -376,8 +376,8 @@ def balance(detailed: bool, limit: int):
                     
                     click.echo(f"\n📊 Summary (last {len(transactions)} transactions):")
                     click.echo(f"Total items processed: {total_items}")
-                    click.echo(f"Total cost: ${total_cost:.2f}")
-                    click.echo(f"Total payments: ${total_payments:.2f}")
+                    click.echo(f"Total cost: ₹{total_cost:.2f}")
+                    click.echo(f"Total payments: ₹{total_payments:.2f}")
                     
                 else:
                     click.echo("\n📋 No transactions found.")

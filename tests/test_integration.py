@@ -54,8 +54,8 @@ class TestEndToEndWorkflows:
         ])
         assert setup_result.exit_code == 0
         assert "Account setup completed successfully!" in setup_result.output
-        assert "Rate per item: $2.50" in setup_result.output
-        assert "$10.00 (you owe)" in setup_result.output
+        assert "Rate per item: ₹2.50" in setup_result.output
+        assert "₹10.00 (you owe)" in setup_result.output
         
         # Step 2: Add first transaction
         transaction1_result = self.runner.invoke(cli, [
@@ -64,16 +64,16 @@ class TestEndToEndWorkflows:
         assert transaction1_result.exit_code == 0
         assert "Transaction recorded successfully!" in transaction1_result.output
         assert "Items processed: 3" in transaction1_result.output
-        assert "Total cost: $7.50" in transaction1_result.output
-        assert "Payment received: $5.00" in transaction1_result.output
+        assert "Total cost: ₹7.50" in transaction1_result.output
+        assert "Payment received: ₹5.00" in transaction1_result.output
         # Balance: 10.00 + 7.50 - 5.00 = 12.50
-        assert "$12.50 (you owe)" in transaction1_result.output
+        assert "₹12.50 (you owe)" in transaction1_result.output
         
         # Step 3: Check balance
         balance_result = self.runner.invoke(cli, ['balance'])
         assert balance_result.exit_code == 0
-        assert "Current balance: $12.50 (you owe)" in balance_result.output
-        assert "Rate per item: $2.50" in balance_result.output
+        assert "Current balance: ₹12.50 (you owe)" in balance_result.output
+        assert "Rate per item: ₹2.50" in balance_result.output
         
         # Step 4: Add second transaction with overpayment
         transaction2_result = self.runner.invoke(cli, [
@@ -81,15 +81,15 @@ class TestEndToEndWorkflows:
         ])
         assert transaction2_result.exit_code == 0
         assert "Items processed: 2" in transaction2_result.output
-        assert "Total cost: $5.00" in transaction2_result.output
+        assert "Total cost: ₹5.00" in transaction2_result.output
         # Balance: 12.50 + 5.00 - 20.00 = -2.50 (credit)
-        assert "$2.50 (you have credit)" in transaction2_result.output
-        assert "Overpayment: $15.00 (applied as credit)" in transaction2_result.output
+        assert "₹2.50 (you have credit)" in transaction2_result.output
+        assert "Overpayment: ₹15.00 (applied as credit)" in transaction2_result.output
         
         # Step 5: Check final balance
         final_balance_result = self.runner.invoke(cli, ['balance'])
         assert final_balance_result.exit_code == 0
-        assert "$2.50 (you have credit)" in final_balance_result.output
+        assert "₹2.50 (you have credit)" in final_balance_result.output
         assert "You have credit available" in final_balance_result.output
     
     def test_workflow_with_zero_balance_result(self):
@@ -103,12 +103,12 @@ class TestEndToEndWorkflows:
             'add-transaction', '--items', '2', '--payment', '11.00'
         ])
         assert transaction_result.exit_code == 0
-        assert "$0.00 (all settled)" in transaction_result.output
+        assert "₹0.00 (all settled)" in transaction_result.output
         
         # Check balance shows settled
         balance_result = self.runner.invoke(cli, ['balance'])
         assert balance_result.exit_code == 0
-        assert "$0.00 (all settled)" in balance_result.output
+        assert "₹0.00 (all settled)" in balance_result.output
         assert "Your account is fully settled" in balance_result.output
     
     def test_workflow_with_detailed_balance_history(self):
@@ -126,8 +126,8 @@ class TestEndToEndWorkflows:
         assert detailed_result.exit_code == 0
         assert "Recent Transactions" in detailed_result.output
         assert "Total items processed: 6" in detailed_result.output
-        assert "Total cost: $12.00" in detailed_result.output
-        assert "Total payments: $8.00" in detailed_result.output
+        assert "Total cost: ₹12.00" in detailed_result.output
+        assert "Total payments: ₹8.00" in detailed_result.output
         
         # Check with custom limit
         limited_result = self.runner.invoke(cli, ['balance', '--detailed', '--limit', '2'])
@@ -140,16 +140,16 @@ class TestEndToEndWorkflows:
         setup_result = self.runner.invoke(cli, ['setup'], input='2.75\n-5.50\n')
         assert setup_result.exit_code == 0
         assert "Account setup completed successfully!" in setup_result.output
-        assert "Rate per item: $2.75" in setup_result.output
-        assert "$5.50 (you have credit)" in setup_result.output
+        assert "Rate per item: ₹2.75" in setup_result.output
+        assert "₹5.50 (you have credit)" in setup_result.output
         
         # Test interactive transaction
         transaction_result = self.runner.invoke(cli, ['add-transaction'], input='4\n10.00\n')
         assert transaction_result.exit_code == 0
         assert "Items processed: 4" in transaction_result.output
-        assert "Total cost: $11.00" in transaction_result.output
+        assert "Total cost: ₹11.00" in transaction_result.output
         # Balance: -5.50 + 11.00 - 10.00 = -4.50 (credit)
-        assert "$4.50 (you have credit)" in transaction_result.output
+        assert "₹4.50 (you have credit)" in transaction_result.output
     
     def test_workflow_with_zero_items_transaction(self):
         """Test workflow with zero items transaction (payment only)."""
@@ -162,14 +162,14 @@ class TestEndToEndWorkflows:
         ])
         assert transaction_result.exit_code == 0
         assert "Items processed: 0" in transaction_result.output
-        assert "Total cost: $0.00" in transaction_result.output
+        assert "Total cost: ₹0.00" in transaction_result.output
         # Balance: 10.00 + 0.00 - 5.00 = 5.00
-        assert "$5.00 (you owe)" in transaction_result.output
+        assert "₹5.00 (you owe)" in transaction_result.output
         
         # Verify balance
         balance_result = self.runner.invoke(cli, ['balance'])
         assert balance_result.exit_code == 0
-        assert "$5.00 (you owe)" in balance_result.output
+        assert "₹5.00 (you owe)" in balance_result.output
 
 
 class TestDataPersistence:
@@ -213,14 +213,14 @@ class TestDataPersistence:
         # Second session: Check that configuration is remembered
         balance_result = self.runner.invoke(cli, ['balance'])
         assert balance_result.exit_code == 0
-        assert "Rate per item: $3.25" in balance_result.output
-        assert "$15.75 (you owe)" in balance_result.output
+        assert "Rate per item: ₹3.25" in balance_result.output
+        assert "₹15.75 (you owe)" in balance_result.output
         
         # Third session: Try to setup again (should warn about existing config)
         setup_again_result = self.runner.invoke(cli, ['setup'], input='n\n')
         assert setup_again_result.exit_code == 0
         assert "Configuration already exists!" in setup_again_result.output
-        assert "Current rate: $3.25 per item" in setup_again_result.output
+        assert "Current rate: ₹3.25 per item" in setup_again_result.output
         assert "Setup cancelled." in setup_again_result.output
     
     def test_transaction_history_persistence(self):
@@ -234,14 +234,14 @@ class TestDataPersistence:
         balance_result = self.runner.invoke(cli, ['balance'])
         assert balance_result.exit_code == 0
         # Balance: 0 + 10 - 8 + 4 - 6 = 0
-        assert "$0.00 (all settled)" in balance_result.output
+        assert "₹0.00 (all settled)" in balance_result.output
         
         # Check detailed history
         detailed_result = self.runner.invoke(cli, ['balance', '--detailed'])
         assert detailed_result.exit_code == 0
         assert "Total items processed: 7" in detailed_result.output
-        assert "Total cost: $14.00" in detailed_result.output
-        assert "Total payments: $14.00" in detailed_result.output
+        assert "Total cost: ₹14.00" in detailed_result.output
+        assert "Total payments: ₹14.00" in detailed_result.output
         
         # Third session: Add another transaction
         self.runner.invoke(cli, ['add-transaction', '--items', '3', '--payment', '5.00'])
@@ -250,8 +250,8 @@ class TestDataPersistence:
         final_detailed_result = self.runner.invoke(cli, ['balance', '--detailed'])
         assert final_detailed_result.exit_code == 0
         assert "Total items processed: 10" in final_detailed_result.output
-        assert "Total cost: $20.00" in final_detailed_result.output
-        assert "Total payments: $19.00" in final_detailed_result.output
+        assert "Total cost: ₹20.00" in final_detailed_result.output
+        assert "Total payments: ₹19.00" in final_detailed_result.output
     
     def test_balance_calculation_persistence(self):
         """Test that balance calculations remain consistent across restarts."""
@@ -263,12 +263,12 @@ class TestDataPersistence:
             'add-transaction', '--items', '4', '--payment', '5.00'
         ])
         # Balance: -10.00 + 10.00 - 5.00 = -5.00 (credit)
-        assert "$5.00 (you have credit)" in transaction_result.output
+        assert "₹5.00 (you have credit)" in transaction_result.output
         
         # Session 3: Verify balance persisted correctly
         balance_result = self.runner.invoke(cli, ['balance'])
         assert balance_result.exit_code == 0
-        assert "$5.00 (you have credit)" in balance_result.output
+        assert "₹5.00 (you have credit)" in balance_result.output
         
         # Session 4: Add another transaction
         self.runner.invoke(cli, ['add-transaction', '--items', '6', '--payment', '10.00'])
@@ -277,7 +277,7 @@ class TestDataPersistence:
         # Session 5: Verify final balance
         final_balance_result = self.runner.invoke(cli, ['balance'])
         assert final_balance_result.exit_code == 0
-        assert "$0.00 (all settled)" in final_balance_result.output
+        assert "₹0.00 (all settled)" in final_balance_result.output
     
     def test_database_file_location(self):
         """Test that database file is created in the correct location."""
@@ -348,8 +348,8 @@ class TestErrorRecoveryAndEdgeCases:
         assert "Please enter a valid number" in setup_result.output
         assert "Rate must be a positive number" in setup_result.output
         assert "Account setup completed successfully!" in setup_result.output
-        assert "Rate per item: $2.50" in setup_result.output
-        assert "$10.00 (you owe)" in setup_result.output
+        assert "Rate per item: ₹2.50" in setup_result.output
+        assert "₹10.00 (you owe)" in setup_result.output
     
     def test_invalid_input_recovery_transaction(self):
         """Test recovery from invalid inputs during transaction."""
@@ -378,28 +378,28 @@ class TestErrorRecoveryAndEdgeCases:
         
         # Verify original configuration unchanged
         balance_result = self.runner.invoke(cli, ['balance'])
-        assert "Rate per item: $2.00" in balance_result.output
-        assert "$5.00 (you owe)" in balance_result.output
+        assert "Rate per item: ₹2.00" in balance_result.output
+        assert "₹5.00 (you owe)" in balance_result.output
         
         # Try to setup again and confirm overwrite
         overwrite_result = self.runner.invoke(cli, ['setup'], input='y\n3.50\n-10.00\n')
         assert overwrite_result.exit_code == 0
         assert "Configuration already exists!" in overwrite_result.output
         assert "Account setup completed successfully!" in overwrite_result.output
-        assert "Rate per item: $3.50" in overwrite_result.output
-        assert "$10.00 (you have credit)" in overwrite_result.output
+        assert "Rate per item: ₹3.50" in overwrite_result.output
+        assert "₹10.00 (you have credit)" in overwrite_result.output
         
         # Verify new configuration is active
         new_balance_result = self.runner.invoke(cli, ['balance'])
-        assert "Rate per item: $3.50" in new_balance_result.output
-        assert "$10.00 (you have credit)" in new_balance_result.output
+        assert "Rate per item: ₹3.50" in new_balance_result.output
+        assert "₹10.00 (you have credit)" in new_balance_result.output
     
     def test_large_numbers_handling(self):
         """Test handling of unusually large numbers."""
         # Setup with large rate (should prompt for confirmation)
         large_rate_result = self.runner.invoke(cli, ['setup'], input='1500.00\ny\n0\n')
         assert large_rate_result.exit_code == 0
-        assert "Rate $1500.00 seems very high" in large_rate_result.output
+        assert "Rate ₹1500.00 seems very high" in large_rate_result.output
         assert "Account setup completed successfully!" in large_rate_result.output
         
         # Add transaction with large item count (should prompt for confirmation)
@@ -418,10 +418,10 @@ class TestErrorRecoveryAndEdgeCases:
         refund_result = self.runner.invoke(cli, ['add-transaction'], 
                                          input='2\n-5.00\ny\n')
         assert refund_result.exit_code == 0
-        assert "Negative payment ($5.00 refund)" in refund_result.output
+        assert "Negative payment (₹5.00 refund)" in refund_result.output
         assert "Transaction recorded successfully!" in refund_result.output
         # Balance: 10.00 + 4.00 - (-5.00) = 19.00
-        assert "$19.00 (you owe)" in refund_result.output
+        assert "₹19.00 (you owe)" in refund_result.output
     
     def test_edge_case_zero_rate_validation(self):
         """Test that zero rate is properly rejected."""
@@ -472,8 +472,8 @@ class TestErrorRecoveryAndEdgeCases:
             # Verify data is accessible
             balance_result = self.runner.invoke(cli, ['balance'])
             assert balance_result.exit_code == 0
-            assert "Rate per item: $2.00" in balance_result.output
-            assert "$5.00 (you owe)" in balance_result.output
+            assert "Rate per item: ₹2.00" in balance_result.output
+            assert "₹5.00 (you owe)" in balance_result.output
         finally:
             # Clean up the nested patcher and restart the original
             nested_patcher.stop()

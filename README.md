@@ -79,8 +79,8 @@ $ saldo setup
 Enter the rate per clothing item (e.g., 2.50): 2.50
 Enter your current balance (positive if you owe money, negative if you have credit, 0 for new account) [0]: 15.00
 ✅ Account setup completed successfully!
-Rate per item: $2.50
-Initial balance: $15.00 (you owe)
+Rate per item: ₹2.50
+Initial balance: ₹15.00 (you owe)
 
 You can now use 'saldo add-transaction' to record transactions.
 ```
@@ -105,17 +105,17 @@ Enter the number of clothing items processed: 3
 
 📊 Transaction Summary:
 Items processed: 3
-Cost per item: $2.50
-Total cost: $7.50
-Previous balance: $15.00
-Total amount due: $22.50
+Cost per item: ₹2.50
+Total cost: ₹7.50
+Previous balance: ₹15.00
+Total amount due: ₹22.50
 
-Enter payment amount (total due: $22.50): 20.00
+Enter payment amount (total due: ₹22.50): 20.00
 
 ✅ Transaction recorded successfully!
-Payment received: $20.00
-New balance: $2.50 (you owe)
-Underpayment: $2.50 (added to balance)
+Payment received: ₹20.00
+New balance: ₹2.50 (you owe)
+Underpayment: ₹2.50 (added to balance)
 ```
 
 ### 3. Checking Balance
@@ -139,23 +139,23 @@ saldo balance --detailed --limit 5
 $ saldo balance --detailed
 💰 Saldo Balance Summary
 =========================
-Rate per item: $2.50
-Current balance: $2.50 (you owe)
+Rate per item: ₹2.50
+Current balance: ₹2.50 (you owe)
 💳 You have an outstanding balance to pay.
 
 📋 Recent Transactions (last 3):
 ----------------------------------------------------------------------
 Date         Items  Cost     Payment  Balance
 ----------------------------------------------------------------------
-2024-01-15   3      $7.50    $20.00   $2.50
-2024-01-10   5      $12.50   $12.50   $15.00
-2024-01-05   2      $5.00    $0.00    $15.00
+2024-01-15   3      ₹7.50    ₹20.00   ₹2.50
+2024-01-10   5      ₹12.50   ₹12.50   ₹15.00
+2024-01-05   2      ₹5.00    ₹0.00    ₹15.00
 ----------------------------------------------------------------------
 
 📊 Summary (last 3 transactions):
 Total items processed: 10
-Total cost: $25.00
-Total payments: $32.50
+Total cost: ₹25.00
+Total payments: ₹32.50
 ```
 
 ## Command Reference
@@ -173,7 +173,7 @@ Initialize or reconfigure your account settings.
 
 ```bash
 saldo setup                           # Interactive setup
-saldo setup --rate 3.00 --balance 0  # Set rate to $3.00, start with $0 balance
+saldo setup --rate 3.00 --balance 0  # Set rate to ₹3.00, start with ₹0 balance
 ```
 
 ### `saldo add-transaction`
@@ -189,7 +189,7 @@ Record a new transaction with items processed and payment made.
 
 ```bash
 saldo add-transaction                    # Interactive entry
-saldo add-transaction --items 4 --payment 8.00  # 4 items, $8.00 payment
+saldo add-transaction --items 4 --payment 8.00  # 4 items, ₹8.00 payment
 ```
 
 ### `saldo balance`
