@@ -28,8 +28,8 @@ class AliasedGroup(click.Group):
         return None
 
 
-@click.group(cls=AliasedGroup)
-@click.version_option(version="0.1.0", prog_name="saldo")
+@click.group(cls=AliasedGroup, context_settings={"help_option_names": ["-h", "--help"]})
+@click.version_option("0.1.0", "-v", "--version", prog_name="saldo")
 def cli():
     """Saldo - A command-line balance tracking application for ironing service transactions."""
     pass
