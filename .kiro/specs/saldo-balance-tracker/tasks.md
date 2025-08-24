@@ -55,8 +55,8 @@
   - Write unit tests for transaction processing and balance calculations
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
-- [ ] 5. Implement CLI interface
-- [ ] 5.1 Create Click CLI framework and setup command
+- [x] 5. Implement CLI interface
+- [x] 5.1 Create Click CLI framework and setup command
 
   - Write cli.py with Click application setup and main command group
   - Implement setup command with prompts for rate and initial balance
@@ -64,7 +64,7 @@
   - Write tests for setup command functionality
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 5.1, 5.2, 5.5_
 
-- [ ] 5.2 Implement add-transaction command
+- [x] 5.2 Implement add-transaction command
 
   - Write add-transaction command with prompts for items and payment
   - Display calculated costs and updated balance to user
@@ -72,7 +72,7 @@
   - Write tests for add-transaction command workflows
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 5.1, 5.2, 5.3_
 
-- [ ] 5.3 Implement balance command
+- [x] 5.3 Implement balance command
 
   - Write balance command to display current balance and rate information
   - Add optional detailed view showing recent transaction history
