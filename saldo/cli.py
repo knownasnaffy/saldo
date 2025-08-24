@@ -58,13 +58,27 @@ def setup(rate: Optional[float], balance: Optional[float]):
                         "Enter the rate per clothing item (e.g., 2.50)",
                         type=str
                     )
+                    rate_input = rate_input.strip()
+                    
+                    # Check for empty input
+                    if not rate_input:
+                        click.echo("❌ Rate cannot be empty. Please try again.")
+                        continue
+                    
                     rate = float(rate_input)
+                    
                     if rate <= 0:
                         click.echo("❌ Rate must be a positive number. Please try again.")
                         continue
+                    
+                    # Check for unusually high rates
+                    if rate > 1000:
+                        if not click.confirm(f"⚠️  Rate ${rate:.2f} seems very high. Are you sure this is correct?"):
+                            continue
+                    
                     break
                 except ValueError:
-                    click.echo("❌ Please enter a valid number. Please try again.")
+                    click.echo("❌ Please enter a valid number (e.g., 2.50). Please try again.")
                     continue
         
         # Validate rate
@@ -80,10 +94,23 @@ def setup(rate: Optional[float], balance: Optional[float]):
                         type=str,
                         default="0"
                     )
+                    balance_input = balance_input.strip()
+                    
+                    # Handle empty input (use default)
+                    if not balance_input:
+                        balance = 0.0
+                        break
+                    
                     balance = float(balance_input)
+                    
+                    # Check for unusually large balances
+                    if abs(balance) > 100000:
+                        if not click.confirm(f"⚠️  Balance ${abs(balance):.2f} seems very large. Are you sure this is correct?"):
+                            continue
+                    
                     break
                 except ValueError:
-                    click.echo("❌ Please enter a valid number. Please try again.")
+                    click.echo("❌ Please enter a valid number (e.g., 10.50, -5.25, or 0). Please try again.")
                     continue
         
         # Setup account with validated inputs
@@ -159,13 +186,27 @@ def add_transaction(items: Optional[int], payment: Optional[float]):
                         "Enter the number of clothing items processed",
                         type=str
                     )
+                    items_input = items_input.strip()
+                    
+                    # Check for empty input
+                    if not items_input:
+                        click.echo("❌ Number of items cannot be empty. Please try again.")
+                        continue
+                    
                     items = int(items_input)
+                    
                     if items < 0:
                         click.echo("❌ Number of items cannot be negative. Please try again.")
                         continue
+                    
+                    # Check for unusually large item counts
+                    if items > 1000:
+                        if not click.confirm(f"⚠️  {items} items seems like a lot. Are you sure this is correct?"):
+                            continue
+                    
                     break
                 except ValueError:
-                    click.echo("❌ Please enter a valid whole number. Please try again.")
+                    click.echo("❌ Please enter a valid whole number (e.g., 5, 10, 0). Please try again.")
                     continue
         
         # Validate items
@@ -191,10 +232,28 @@ def add_transaction(items: Optional[int], payment: Optional[float]):
                         f"Enter payment amount (total due: ${total_due:.2f})",
                         type=str
                     )
+                    payment_input = payment_input.strip()
+                    
+                    # Check for empty input
+                    if not payment_input:
+                        click.echo("❌ Payment amount cannot be empty. Please try again.")
+                        continue
+                    
                     payment = float(payment_input)
+                    
+                    # Check for unusually large payments
+                    if abs(payment) > 100000:
+                        if not click.confirm(f"⚠️  Payment amount ${abs(payment):.2f} seems very large. Are you sure this is correct?"):
+                            continue
+                    
+                    # Warn about negative payments (refunds)
+                    if payment < 0:
+                        if not click.confirm(f"⚠️  Negative payment (${abs(payment):.2f} refund). Is this correct?"):
+                            continue
+                    
                     break
                 except ValueError:
-                    click.echo("❌ Please enter a valid number. Please try again.")
+                    click.echo("❌ Please enter a valid number (e.g., 10.50, 0, -5.25). Please try again.")
                     continue
         
         # Process the transaction
