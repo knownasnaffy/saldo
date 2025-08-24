@@ -10,8 +10,19 @@ from typing import Optional
 from .transaction_manager import TransactionManager
 from .exceptions import SaldoError, ValidationError, ConfigurationError, DatabaseError
 
+class AliasedGroup(click.Group):
+    def get_command(self, ctx, cmd_name):
+        # Look up the command the normal way
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+        # Try aliases
+        matches = [c for c, cmd in self.commands.items() if cmd_name in getattr(cmd, "aliases", [])]
+        if matches:
+            return self.commands[matches[0]]
+        return None
 
-@click.group()
+@click.group(cls=AliasedGroup)
 @click.version_option(version="0.1.0", prog_name="saldo")
 def cli():
     """Saldo - A command-line balance tracking application for ironing service transactions."""
@@ -294,6 +305,7 @@ def add_transaction(items: Optional[int], payment: Optional[float]):
         click.echo(f"❌ Unexpected error: {e}", err=True)
         raise click.ClickException(f"Unexpected error: {e}")
 
+add_transaction.aliases = ["add"]
 
 @cli.command()
 @click.option('--detailed', '-d', is_flag=True, help='Show detailed transaction history')
@@ -403,6 +415,7 @@ def balance(detailed: bool, limit: int):
         click.echo(f"❌ Unexpected error: {e}", err=True)
         raise click.ClickException(f"Unexpected error: {e}")
 
+balance.aliases = ["bal"]
 
 if __name__ == '__main__':
     cli()
