@@ -2,6 +2,14 @@
 
 A command-line balance tracking application for managing financial transactions with an ironing service provider. Saldo helps you track clothing items processed, calculate costs at a fixed rate, manage payments, and maintain accurate running balances with persistent data storage.
 
+## Use Case
+
+You often buy a service or product from someone. The payments aren’t always exact - you pay more, sometimes less, and settle the difference later. Your balance keeps shifting, and it’s hard to keep track in your head. Writing it down in notes doesn’t help with the math, and spreadsheets feel too heavy for something so simple.
+
+That’s where **Saldo** comes in. Just set the price of the item or service, record each transaction, and let Saldo handle the balance for you.
+
+I personally use this app for my ironing balance, because tracking down small changes became difficult.
+
 ## Features
 
 - 🧾 **Transaction Tracking**: Record clothing items processed and payments made
