@@ -30,8 +30,8 @@ def cli():
 
 
 @cli.command()
-@click.option('--rate', type=float, help='Rate per clothing item')
-@click.option('--balance', type=float, help='Initial balance (positive = owed, negative = credit)')
+@click.option('-r', '--rate', type=float, help='Rate per clothing item')
+@click.option('-b', '--balance', type=float, help='Initial balance (positive = owed, negative = credit)')
 def setup(rate: Optional[float], balance: Optional[float]):
     """Initialize the application with ironing service rate and current balance.
     
@@ -158,8 +158,8 @@ def setup(rate: Optional[float], balance: Optional[float]):
 
 
 @cli.command('add-transaction')
-@click.option('--items', type=int, help='Number of clothing items')
-@click.option('--payment', type=float, help='Payment amount')
+@click.option('-i', '--items', type=int, help='Number of clothing items')
+@click.option('-p', '--payment', type=float, help='Payment amount')
 def add_transaction(items: Optional[int], payment: Optional[float]):
     """Add a new ironing transaction with items and payment.
     
@@ -308,8 +308,8 @@ def add_transaction(items: Optional[int], payment: Optional[float]):
 add_transaction.aliases = ["add"]
 
 @cli.command()
-@click.option('--detailed', '-d', is_flag=True, help='Show detailed transaction history')
-@click.option('--limit', type=int, default=10, help='Number of recent transactions to show (default: 10)')
+@click.option('-d', '--detailed', '-d', is_flag=True, help='Show detailed transaction history')
+@click.option('-l', '--limit', type=int, default=10, help='Number of recent transactions to show (default: 10)')
 def balance(detailed: bool, limit: int):
     """Display current balance and rate information.
     
