@@ -17,37 +17,37 @@
   - Write unit tests for model validation and exception handling
   - _Requirements: 4.1, 5.1, 5.4_
 
-- [ ] 3. Implement database layer
-- [ ] 3.1 Create database connection and schema management
+- [x] 3. Implement database layer
+- [x] 3.1 Create database connection and schema management
 
   - Write DatabaseManager class with SQLite connection handling
   - Implement initialize_database method to create tables with proper schema
   - Create database file in ~/.saldo/ directory with automatic directory creation
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 3.2 Implement configuration data operations
+- [x] 3.2 Implement configuration data operations
 
   - Write save_configuration and get_configuration methods in DatabaseManager
   - Add validation for configuration data before database operations
   - Write unit tests for configuration CRUD operations
   - _Requirements: 1.5, 4.3, 4.4_
 
-- [ ] 3.3 Implement transaction data operations
+- [x] 3.3 Implement transaction data operations
 
   - Write save_transaction, get_transactions, and get_current_balance methods
   - Implement proper transaction handling for data consistency
   - Write unit tests for transaction CRUD operations and balance calculations
   - _Requirements: 2.6, 4.3, 4.4_
 
-- [ ] 4. Implement business logic layer
-- [ ] 4.1 Create TransactionManager class with core business methods
+- [x] 4. Implement business logic layer
+- [x] 4.1 Create TransactionManager class with core business methods
 
   - Write setup_account method to initialize rate and balance configuration
   - Implement calculate_cost method for item cost calculations
   - Write unit tests for business logic methods
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 4.2 Implement transaction processing logic
+- [x] 4.2 Implement transaction processing logic
 
   - Write add_transaction method to handle new transactions with balance updates
   - Implement get_current_balance method to retrieve balance with transaction history
