@@ -351,7 +351,7 @@ add_transaction.aliases = ["add"]
 
 @cli.command()
 @click.option(
-    "-d", "--detailed", "-d", is_flag=True, help="Show detailed transaction history"
+    "-d", "--detailed", is_flag=True, help="Show detailed transaction history"
 )
 @click.option(
     "-l",
