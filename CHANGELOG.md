@@ -9,12 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial project setup with CLI framework
-- SQLite database integration
-- Transaction management system
-- Balance tracking functionality
-
 ### Changed
+
+- Better help messages
 
 ### Deprecated
 
@@ -23,6 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [0.1.1] - 2025-08-31
+
+### Changed
+
+- Refactor version management to single source of truth
+
+### Fixed
+
+- Fix duplicate option for balance command
 
 ## [0.1.0] - 2025-08-31
 
