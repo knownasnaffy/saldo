@@ -8,7 +8,7 @@
   - Write unit tests for the database update method
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 2. Extend TransactionManager with configuration update methods
+- [x] 2. Extend TransactionManager with configuration update methods
 
   - Implement `update_rate()` method in `TransactionManager` class
   - Add validation logic for new rate values
