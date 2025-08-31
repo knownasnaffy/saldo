@@ -488,5 +488,128 @@ def balance(detailed: bool, limit: int):
 
 balance.aliases = ["bal"]
 
+
+@cli.command()
+@click.option("-r", "--rate", type=float, help="New rate per clothing item")
+@click.option("--no-confirm", is_flag=True, help="Skip confirmation prompt")
+def config(rate: Optional[float], no_confirm: bool):
+    """View or update configuration settings.
+
+    \b
+    This command allows you to:
+      - View current configuration (rate, initial balance, creation date)
+      - Update the rate per clothing item
+      - Historical transactions remain unchanged when rate is updated
+
+    \b
+    Examples:
+      $ saldo config                    # View current configuration
+      $ saldo config --rate 3.50       # Update rate with confirmation
+      $ saldo config -r 3.50 --no-confirm  # Update rate without confirmation
+
+    \b
+    Note: Changing the rate only affects future transactions.
+    All historical transactions and their costs remain unchanged.
+    """
+    try:
+        transaction_manager = TransactionManager()
+
+        # Check if configuration exists
+        try:
+            existing_config = transaction_manager.db_manager.get_configuration()
+            if not existing_config:
+                click.echo("❌ No configuration found. Please run 'saldo setup' first.")
+                raise click.ClickException("Configuration required")
+        except DatabaseError as e:
+            click.echo(f"❌ Database Error: {e}", err=True)
+            raise click.ClickException(str(e))
+
+        # If no rate provided, display current configuration
+        if rate is None:
+            config_display = transaction_manager.get_configuration_display()
+            
+            click.echo("⚙️  Current Configuration")
+            click.echo("=" * 25)
+            click.echo(f"Rate per item: ₹{config_display['rate_per_item']:.2f}")
+            click.echo(f"Initial balance: ₹{config_display['initial_balance']:.2f}")
+            click.echo(f"Created: {config_display['created_at']}")
+            
+            current_balance = transaction_manager.get_current_balance()
+            if current_balance > 0:
+                click.echo(f"Current balance: ₹{current_balance:.2f} (you owe)")
+            elif current_balance < 0:
+                click.echo(f"Current balance: ₹{abs(current_balance):.2f} (you have credit)")
+            else:
+                click.echo("Current balance: ₹0.00 (all settled)")
+            
+            click.echo("\n💡 Use 'saldo config --rate <amount>' to update the rate.")
+            return
+
+        # Validate new rate
+        if rate <= 0:
+            click.echo("❌ Rate must be a positive number.")
+            raise click.ClickException("Invalid rate")
+
+        # Check for extremely high rates
+        if rate > 1000:
+            if not no_confirm:
+                if not click.confirm(
+                    f"⚠️  Rate ₹{rate:.2f} seems very high. Are you sure this is correct?"
+                ):
+                    click.echo("Rate update cancelled.")
+                    return
+
+        # Display current vs new rate information
+        current_rate = existing_config['rate_per_item']
+        click.echo("📊 Rate Update Summary")
+        click.echo("=" * 22)
+        click.echo(f"Current rate: ₹{current_rate:.2f} per item")
+        click.echo(f"New rate: ₹{rate:.2f} per item")
+        
+        if rate > current_rate:
+            change = rate - current_rate
+            click.echo(f"Increase: ₹{change:.2f} per item (+{(change/current_rate)*100:.1f}%)")
+        elif rate < current_rate:
+            change = current_rate - rate
+            click.echo(f"Decrease: ₹{change:.2f} per item (-{(change/current_rate)*100:.1f}%)")
+        else:
+            click.echo("No change in rate.")
+            return
+
+        # Confirmation prompt unless --no-confirm is used
+        if not no_confirm:
+            click.echo("\n⚠️  Important: Historical transactions will remain unchanged.")
+            click.echo("Only future transactions will use the new rate.")
+            
+            if not click.confirm("\nDo you want to update the rate?"):
+                click.echo("Rate update cancelled.")
+                return
+
+        # Update the rate
+        update_result = transaction_manager.update_rate(rate)
+        
+        # Display success message
+        click.echo("\n✅ Rate updated successfully!")
+        click.echo(f"New rate: ₹{update_result['new_rate']:.2f} per item")
+        click.echo("📝 Historical transactions remain unchanged.")
+        click.echo("🔮 Future transactions will use the new rate.")
+
+    except ValidationError as e:
+        click.echo(f"❌ Validation Error: {e}", err=True)
+        raise click.ClickException(str(e))
+    except ConfigurationError as e:
+        click.echo(f"❌ Configuration Error: {e}", err=True)
+        raise click.ClickException(str(e))
+    except DatabaseError as e:
+        click.echo(f"❌ Database Error: {e}", err=True)
+        raise click.ClickException(str(e))
+    except SaldoError as e:
+        click.echo(f"❌ Error: {e}", err=True)
+        raise click.ClickException(str(e))
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {e}", err=True)
+        raise click.ClickException(f"Unexpected error: {e}")
+
+
 if __name__ == "__main__":
     cli()

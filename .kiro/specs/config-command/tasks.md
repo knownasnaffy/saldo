@@ -17,7 +17,7 @@
   - Write unit tests for transaction manager configuration methods
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 5.1, 5.2_
 
-- [ ] 3. Create the config CLI command structure
+- [x] 3. Create the config CLI command structure
 
   - Add `config` command to `cli.py` with Click decorators
   - Implement command-line options for `--rate` and `--no-confirm`
