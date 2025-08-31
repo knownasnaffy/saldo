@@ -40,8 +40,6 @@ Then verify:
 saldo --help
 ```
 
----
-
 ### One-liner Install (with pipx)
 
 If you just want to install directly from GitHub without cloning:
@@ -49,8 +47,6 @@ If you just want to install directly from GitHub without cloning:
 ```bash
 pipx install git+https://github.com/knownasnaffy/saldo.git
 ```
-
----
 
 ### Alternative (virtual environment)
 
@@ -81,8 +77,6 @@ If you don’t want to use `pipx`, you can install Saldo in a virtual environmen
    ```bash
    saldo --help
    ```
-
----
 
 ### Alternative (manual dependency install)
 
