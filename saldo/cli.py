@@ -46,13 +46,15 @@ def cli():
 def setup(rate: Optional[float], balance: Optional[float]):
     """Initialize the application with ironing service rate and current balance.
 
+    \b
     This command sets up your account configuration including:
-    - Fixed rate per clothing item
-    - Initial balance (positive if you owe money, negative if you have credit)
+      - Fixed rate per clothing item
+      - Initial balance (positive if you owe money, negative if you have credit)
 
+    \b
     Example:
-        saldo setup --rate 2.50 --balance 10.00
-        saldo setup  # Interactive prompts
+      $ saldo setup --rate 2.50 --balance 10.00
+      $ saldo setup  # Interactive prompts
     """
     try:
         transaction_manager = TransactionManager()
@@ -189,14 +191,16 @@ def setup(rate: Optional[float], balance: Optional[float]):
 def add_transaction(items: Optional[int], payment: Optional[float]):
     """Add a new ironing transaction with items and payment.
 
+    \b
     This command records a new transaction including:
-    - Number of clothing items processed
-    - Payment amount made
-    - Automatically calculates cost and updates balance
+      - Number of clothing items processed
+      - Payment amount made
+      - Automatically calculates cost and updates balance
 
+    \b
     Example:
-        saldo add-transaction --items 5 --payment 10.00
-        saldo add-transaction  # Interactive prompts
+      $ saldo add-transaction --items 5 --payment 10.00
+      $ saldo add-transaction  # Interactive prompts
     """
     try:
         transaction_manager = TransactionManager()
@@ -363,15 +367,17 @@ add_transaction.aliases = ["add"]
 def balance(detailed: bool, limit: int):
     """Display current balance and rate information.
 
+    \b
     Shows your current balance with the ironing service, including:
-    - Current balance amount and direction (owed/credit)
-    - Configured rate per item
-    - Optional transaction history with --detailed flag
+      - Current balance amount and direction (owed/credit)
+      - Configured rate per item
+      - Optional transaction history with --detailed flag
 
+    \b
     Example:
-        saldo balance
-        saldo balance --detailed
-        saldo balance --detailed --limit 5
+      $ saldo balance
+      $ saldo balance --detailed
+      $ saldo balance --detailed --limit 5
     """
     try:
         transaction_manager = TransactionManager()
