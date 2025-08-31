@@ -190,6 +190,88 @@ class TestDatabaseManager:
         db_manager = DatabaseManager(custom_path)
         assert db_manager.db_path == custom_path
 
+    def test_update_configuration_rate_success(self, temp_db):
+        """Test successful rate update."""
+        # Save initial configuration
+        temp_db.save_configuration(2.0, 10.0)
+        
+        # Update rate
+        new_rate = 3.5
+        temp_db.update_configuration_rate(new_rate)
+        
+        # Verify rate was updated
+        config = temp_db.get_configuration()
+        assert config["rate_per_item"] == new_rate
+        # Verify initial balance was preserved
+        assert config["initial_balance"] == 10.0
+        # Verify created_at was preserved
+        assert "created_at" in config
+
+    def test_update_configuration_rate_preserves_initial_balance(self, temp_db):
+        """Test that rate update preserves initial balance."""
+        original_rate = 2.5
+        original_balance = 25.0
+        
+        # Save initial configuration
+        temp_db.save_configuration(original_rate, original_balance)
+        original_config = temp_db.get_configuration()
+        
+        # Update rate
+        new_rate = 4.0
+        temp_db.update_configuration_rate(new_rate)
+        
+        # Verify initial balance and created_at are unchanged
+        updated_config = temp_db.get_configuration()
+        assert updated_config["initial_balance"] == original_balance
+        assert updated_config["created_at"] == original_config["created_at"]
+        assert updated_config["rate_per_item"] == new_rate
+
+    def test_update_configuration_rate_validation_negative(self, temp_db):
+        """Test rate update validation for negative values."""
+        # Save initial configuration
+        temp_db.save_configuration(2.0, 10.0)
+        
+        # Try to update with negative rate
+        with pytest.raises(ValueError, match="Rate must be positive"):
+            temp_db.update_configuration_rate(-1.0)
+
+    def test_update_configuration_rate_validation_zero(self, temp_db):
+        """Test rate update validation for zero values."""
+        # Save initial configuration
+        temp_db.save_configuration(2.0, 10.0)
+        
+        # Try to update with zero rate
+        with pytest.raises(ValueError, match="Rate must be positive"):
+            temp_db.update_configuration_rate(0.0)
+
+    def test_update_configuration_rate_validation_non_numeric(self, temp_db):
+        """Test rate update validation for non-numeric values."""
+        # Save initial configuration
+        temp_db.save_configuration(2.0, 10.0)
+        
+        # Try to update with non-numeric rate
+        with pytest.raises(ValueError, match="Rate must be a number"):
+            temp_db.update_configuration_rate("invalid")
+
+    def test_update_configuration_rate_no_config_exists(self, temp_db):
+        """Test rate update when no configuration exists."""
+        # Try to update rate without existing configuration
+        with pytest.raises(ValueError, match="No configuration found. Please run setup first."):
+            temp_db.update_configuration_rate(3.0)
+
+    def test_update_configuration_rate_with_float_conversion(self, temp_db):
+        """Test that rate update properly converts integer to float."""
+        # Save initial configuration
+        temp_db.save_configuration(2.0, 10.0)
+        
+        # Update with integer rate (should be converted to float)
+        temp_db.update_configuration_rate(5)
+        
+        # Verify rate was updated and converted to float
+        config = temp_db.get_configuration()
+        assert config["rate_per_item"] == 5.0
+        assert isinstance(config["rate_per_item"], float)
+
     def test_connection_management(self):
         """Test database connection management."""
         with tempfile.NamedTemporaryFile(delete=False, suffix=".db") as f:

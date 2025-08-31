@@ -340,6 +340,66 @@ class DatabaseManager:
             else:
                 raise DatabaseError(f"Failed to get transactions: {e}")
 
+    def update_configuration_rate(self, new_rate: float) -> None:
+        """
+        Update only the rate_per_item in the configuration table.
+
+        Args:
+            new_rate: New rate per clothing item
+
+        Raises:
+            DatabaseError: If database operation fails
+            ValueError: If rate is not positive or configuration doesn't exist
+        """
+        if not isinstance(new_rate, (int, float)):
+            raise ValueError("Rate must be a number")
+
+        if new_rate <= 0:
+            raise ValueError("Rate must be positive")
+
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            # Check if configuration exists
+            cursor.execute("SELECT COUNT(*) as count FROM configuration")
+            row = cursor.fetchone()
+            if row["count"] == 0:
+                raise ValueError("No configuration found. Please run setup first.")
+
+            # Update only the rate_per_item field
+            cursor.execute(
+                """
+                UPDATE configuration 
+                SET rate_per_item = ?
+                WHERE id = (SELECT id FROM configuration LIMIT 1)
+            """,
+                (float(new_rate),),
+            )
+
+            if cursor.rowcount == 0:
+                raise DatabaseError("Failed to update configuration rate")
+
+            conn.commit()
+
+        except sqlite3.IntegrityError as e:
+            conn.rollback()
+            if "rate_per_item" in str(e):
+                raise DatabaseError(
+                    "Rate must be positive", f"Database constraint violation: {e}"
+                )
+            else:
+                raise DatabaseError(f"Data integrity error: {e}")
+        except sqlite3.Error as e:
+            conn.rollback()
+            if "database is locked" in str(e).lower():
+                raise DatabaseError(
+                    "Database is locked by another process",
+                    "Please close other instances of the application",
+                )
+            else:
+                raise DatabaseError(f"Failed to update configuration rate: {e}")
+
     def get_current_balance(self) -> float:
         """
         Get current balance from the most recent transaction or initial balance.
