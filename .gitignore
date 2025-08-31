@@ -165,6 +165,9 @@ cython_debug/
 # User data directory (contains SQLite database)
 ~/.saldo/
 
+# Release artifacts
+changelog.txt
+
 # Temporary files
 *.tmp
 *.temp
