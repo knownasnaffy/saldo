@@ -304,3 +304,96 @@ class TransactionManager:
             )
 
         return config_data
+
+    def update_rate(self, new_rate: float) -> Dict[str, Any]:
+        """
+        Update the rate per item in configuration.
+
+        Args:
+            new_rate: New rate per clothing item (must be positive)
+
+        Returns:
+            Dictionary with update details including old and new rates
+
+        Raises:
+            ValidationError: If new rate is invalid
+            ConfigurationError: If no configuration exists
+            DatabaseError: If database operation fails
+        """
+        # Validate new rate with enhanced error messages
+        if not isinstance(new_rate, (int, float)):
+            raise ValidationError(
+                "Rate must be a number", f"Received type: {type(new_rate).__name__}"
+            )
+
+        if new_rate <= 0:
+            raise ValidationError(
+                "Rate per item must be positive", f"Received value: {new_rate}"
+            )
+
+        # Check for extremely large values that might cause issues
+        if new_rate > 1000:
+            raise ValidationError(
+                "Rate per item seems unusually high",
+                f"Received value: {new_rate}. Please verify this is correct.",
+            )
+
+        # Get current configuration to compare rates
+        try:
+            current_config = self._get_configuration()
+        except ConfigurationError:
+            raise  # Re-raise configuration errors as-is
+        except Exception as e:
+            raise DatabaseError(
+                f"Failed to retrieve current configuration: {e}",
+                "Please check database connectivity",
+            )
+
+        old_rate = current_config["rate_per_item"]
+
+        # Update rate in database
+        try:
+            self.db_manager.update_configuration_rate(float(new_rate))
+        except ValueError as e:
+            raise ValidationError(f"Invalid rate value: {e}")
+        except Exception as e:
+            raise DatabaseError(
+                f"Failed to update configuration rate: {e}",
+                "Please check database permissions and connectivity",
+            )
+
+        return {
+            "old_rate": old_rate,
+            "new_rate": float(new_rate),
+            "updated_at": datetime.now(),
+        }
+
+    def get_configuration_display(self) -> Dict[str, Any]:
+        """
+        Get configuration data formatted for display.
+
+        Returns:
+            Dictionary with formatted configuration data for user display
+
+        Raises:
+            ConfigurationError: If no configuration exists
+            DatabaseError: If database operation fails
+        """
+        try:
+            config_data = self._get_configuration()
+        except ConfigurationError:
+            raise  # Re-raise configuration errors as-is
+        except Exception as e:
+            raise DatabaseError(
+                f"Failed to retrieve configuration: {e}",
+                "Please check database connectivity",
+            )
+
+        # Format the configuration data for display
+        return {
+            "rate_per_item": config_data["rate_per_item"],
+            "initial_balance": config_data["initial_balance"],
+            "created_at": config_data["created_at"],
+            "formatted_rate": f"₹{config_data['rate_per_item']:.2f}",
+            "formatted_initial_balance": f"₹{config_data['initial_balance']:.2f}",
+        }

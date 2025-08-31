@@ -303,6 +303,151 @@ class TestTransactionManager:
         with pytest.raises(ConfigurationError, match="No configuration found"):
             self.transaction_manager.get_current_balance()
 
+    def test_update_rate_valid(self):
+        """Test update_rate with valid new rate."""
+        # Setup initial configuration
+        initial_rate = 2.50
+        initial_balance = 10.0
+        self.transaction_manager.setup_account(initial_rate, initial_balance)
+
+        # Update rate
+        new_rate = 3.75
+        result = self.transaction_manager.update_rate(new_rate)
+
+        # Verify result
+        assert result["old_rate"] == initial_rate
+        assert result["new_rate"] == new_rate
+        assert "updated_at" in result
+
+        # Verify rate was actually updated in database
+        config = self.db_manager.get_configuration()
+        assert config["rate_per_item"] == new_rate
+        assert config["initial_balance"] == initial_balance  # Should be preserved
+
+    def test_update_rate_integer_input(self):
+        """Test update_rate with integer input."""
+        self.transaction_manager.setup_account(2.0, 5.0)
+
+        new_rate = 4  # integer
+        result = self.transaction_manager.update_rate(new_rate)
+
+        assert result["old_rate"] == 2.0
+        assert result["new_rate"] == 4.0
+
+        # Verify in database
+        config = self.db_manager.get_configuration()
+        assert config["rate_per_item"] == 4.0
+
+    def test_update_rate_same_rate(self):
+        """Test update_rate with same rate as current."""
+        rate = 2.25
+        self.transaction_manager.setup_account(rate, 0.0)
+
+        result = self.transaction_manager.update_rate(rate)
+
+        assert result["old_rate"] == rate
+        assert result["new_rate"] == rate
+
+    def test_update_rate_invalid_negative(self):
+        """Test update_rate with negative rate."""
+        self.transaction_manager.setup_account(2.0, 0.0)
+
+        with pytest.raises(ValidationError, match="Rate per item must be positive"):
+            self.transaction_manager.update_rate(-1.5)
+
+    def test_update_rate_invalid_zero(self):
+        """Test update_rate with zero rate."""
+        self.transaction_manager.setup_account(2.0, 0.0)
+
+        with pytest.raises(ValidationError, match="Rate per item must be positive"):
+            self.transaction_manager.update_rate(0.0)
+
+    def test_update_rate_invalid_type(self):
+        """Test update_rate with non-numeric rate."""
+        self.transaction_manager.setup_account(2.0, 0.0)
+
+        with pytest.raises(ValidationError, match="Rate must be a number"):
+            self.transaction_manager.update_rate("invalid")
+
+        with pytest.raises(ValidationError, match="Rate must be a number"):
+            self.transaction_manager.update_rate(None)
+
+    def test_update_rate_extremely_high(self):
+        """Test update_rate with extremely high rate."""
+        self.transaction_manager.setup_account(2.0, 0.0)
+
+        with pytest.raises(ValidationError, match="Rate per item seems unusually high"):
+            self.transaction_manager.update_rate(1500.0)
+
+    def test_update_rate_no_configuration(self):
+        """Test update_rate when no configuration exists."""
+        with pytest.raises(ConfigurationError, match="No configuration found"):
+            self.transaction_manager.update_rate(3.0)
+
+    def test_get_configuration_display_valid(self):
+        """Test get_configuration_display with valid configuration."""
+        rate = 2.75
+        initial_balance = 15.50
+        self.transaction_manager.setup_account(rate, initial_balance)
+
+        result = self.transaction_manager.get_configuration_display()
+
+        # Check raw values
+        assert result["rate_per_item"] == rate
+        assert result["initial_balance"] == initial_balance
+        assert "created_at" in result
+
+        # Check formatted values
+        assert result["formatted_rate"] == "₹2.75"
+        assert result["formatted_initial_balance"] == "₹15.50"
+
+    def test_get_configuration_display_negative_balance(self):
+        """Test get_configuration_display with negative initial balance."""
+        rate = 3.00
+        initial_balance = -25.75
+        self.transaction_manager.setup_account(rate, initial_balance)
+
+        result = self.transaction_manager.get_configuration_display()
+
+        assert result["rate_per_item"] == rate
+        assert result["initial_balance"] == initial_balance
+        assert result["formatted_rate"] == "₹3.00"
+        assert result["formatted_initial_balance"] == "₹-25.75"
+
+    def test_get_configuration_display_zero_balance(self):
+        """Test get_configuration_display with zero initial balance."""
+        rate = 1.25
+        initial_balance = 0.0
+        self.transaction_manager.setup_account(rate, initial_balance)
+
+        result = self.transaction_manager.get_configuration_display()
+
+        assert result["rate_per_item"] == rate
+        assert result["initial_balance"] == initial_balance
+        assert result["formatted_rate"] == "₹1.25"
+        assert result["formatted_initial_balance"] == "₹0.00"
+
+    def test_get_configuration_display_formatting_precision(self):
+        """Test get_configuration_display formatting with various decimal places."""
+        rate = 2.123456  # Many decimal places
+        initial_balance = 10.1  # One decimal place
+        self.transaction_manager.setup_account(rate, initial_balance)
+
+        result = self.transaction_manager.get_configuration_display()
+
+        # Raw values should preserve precision
+        assert result["rate_per_item"] == rate
+        assert result["initial_balance"] == initial_balance
+
+        # Formatted values should have 2 decimal places
+        assert result["formatted_rate"] == "₹2.12"  # Rounded to 2 decimals
+        assert result["formatted_initial_balance"] == "₹10.10"
+
+    def test_get_configuration_display_no_configuration(self):
+        """Test get_configuration_display when no configuration exists."""
+        with pytest.raises(ConfigurationError, match="No configuration found"):
+            self.transaction_manager.get_configuration_display()
+
 
 class TestTransactionManagerIntegration:
     """Integration tests for TransactionManager with real database operations."""
