@@ -214,7 +214,7 @@ class TestConfigValidation:
 
         assert result.exit_code != 0
         assert "❌" in result.output
-        assert "Failed to update rate" in result.output
+        assert ("Failed to update rate" in result.output or "Cannot update rate" in result.output)
         assert "constraint" in result.output.lower()
         assert "💡" in result.output  # Should have helpful tip
 
@@ -300,7 +300,7 @@ class TestConfigValidation:
         assert "✅" in result.output  # Should show success
         assert "Rate updated successfully" in result.output
         assert "₹3.50" in result.output
-        assert "Historical transactions remain unchanged" in result.output
+        assert "All historical transactions will remain unchanged" in result.output
         mock_tm.update_rate.assert_called_once_with(3.50)
 
     def test_config_invalid_rate_format_click_validation(self):

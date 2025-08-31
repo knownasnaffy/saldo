@@ -645,12 +645,25 @@ def config(rate: Optional[float], no_confirm: bool):
 
         # Confirmation prompt unless --no-confirm is used
         if not no_confirm:
-            click.echo("\n⚠️  Important: Historical transactions will remain unchanged.")
-            click.echo("Only future transactions will use the new rate.")
+            click.echo("\n📋 Transaction Independence Information:")
+            click.echo("=" * 40)
+            click.echo("✅ All historical transactions will remain unchanged")
+            click.echo("✅ Past transaction costs will keep their original values")
+            click.echo("✅ Your transaction history will stay accurate")
+            click.echo("🔮 Only future transactions will use the new rate")
+            click.echo("💡 This ensures your financial records remain consistent")
             
             if not click.confirm("\nDo you want to update the rate?"):
                 click.echo("Rate update cancelled.")
                 return
+
+        # Show transaction independence information even with --no-confirm
+        if no_confirm:
+            click.echo("\n📋 Transaction Independence Information:")
+            click.echo("=" * 40)
+            click.echo("✅ All historical transactions will remain unchanged")
+            click.echo("✅ Past transaction costs will keep their original values")
+            click.echo("🔮 Future transactions will use the new rate")
 
         # Update the rate with enhanced error handling
         try:
@@ -677,11 +690,17 @@ def config(rate: Optional[float], no_confirm: bool):
                 click.echo("💡 Please check database connectivity and try again.", err=True)
             raise click.ClickException(str(e))
         
-        # Display success message
+        # Display success message with detailed transaction independence confirmation
         click.echo("\n✅ Rate updated successfully!")
         click.echo(f"New rate: ₹{update_result['new_rate']:.2f} per item")
-        click.echo("📝 Historical transactions remain unchanged.")
-        click.echo("🔮 Future transactions will use the new rate.")
+        
+        click.echo("\n📋 Transaction Independence Confirmed:")
+        click.echo("=" * 35)
+        click.echo("✅ All historical transactions remain unchanged")
+        click.echo("✅ Past costs and balances are preserved exactly")
+        click.echo("✅ Your financial history maintains complete accuracy")
+        click.echo("🔮 Future transactions will use the new rate")
+        click.echo("💡 You can safely view your transaction history anytime")
 
     except ValidationError as e:
         # ValidationError already handled above in specific cases, this is fallback
