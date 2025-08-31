@@ -21,13 +21,40 @@ I personally use this app for my ironing balance, because tracking down small ch
 
 ## Installation
 
-### Prerequisites
+### Recommended (using `pipx`)
 
-- Python 3.7 or higher
-- Linux operating system
-- Git (for cloning the repository)
+We recommend installing **Saldo** with [pipx](https://pypa.github.io/pipx/) for two reasons:
 
-### Quick Install
+* It keeps the app isolated from system Python packages.
+* It automatically puts the `saldo` command on your PATH (no need to call `python -m saldo`).
+
+```bash
+git clone <repository-url>
+cd saldo
+pipx install -e .
+```
+
+Then verify:
+
+```bash
+saldo --help
+```
+
+---
+
+### One-liner Install (with pipx)
+
+If you just want to install directly from GitHub without cloning:
+
+```bash
+pipx install git+https://github.com/knownasnaffy/saldo.git
+```
+
+---
+
+### Alternative (virtual environment)
+
+If you don’t want to use `pipx`, you can install Saldo in a virtual environment:
 
 1. **Clone the repository:**
 
@@ -50,19 +77,19 @@ I personally use this app for my ironing balance, because tracking down small ch
    ```
 
 4. **Verify installation:**
+
    ```bash
    saldo --help
    ```
 
-### Alternative Installation
+---
 
-If you prefer to install dependencies separately:
+### Alternative (manual dependency install)
+
+If you prefer to install dependencies manually:
 
 ```bash
-# Install dependencies first
 pip install -r requirements.txt
-
-# Then install the package
 pip install -e .
 ```
 
