@@ -489,8 +489,26 @@ def balance(detailed: bool, limit: int):
 balance.aliases = ["bal"]
 
 
+def validate_rate_option(ctx, param, value):
+    """Validate rate option with user-friendly error messages."""
+    if value is None:
+        return value
+    
+    try:
+        # Click already converted to float, but let's add additional validation
+        if not isinstance(value, (int, float)):
+            raise click.BadParameter("Rate must be a valid number (e.g., 2.50, 3.75)")
+        
+        # Check for NaN or infinity
+        if not (value == value) or value == float('inf') or value == float('-inf'):
+            raise click.BadParameter("Rate must be a finite number")
+            
+        return value
+    except (ValueError, TypeError):
+        raise click.BadParameter("Rate must be a valid number (e.g., 2.50, 3.75)")
+
 @cli.command()
-@click.option("-r", "--rate", type=float, help="New rate per clothing item")
+@click.option("-r", "--rate", type=float, callback=validate_rate_option, help="New rate per clothing item")
 @click.option("--no-confirm", is_flag=True, help="Skip confirmation prompt")
 def config(rate: Optional[float], no_confirm: bool):
     """View or update configuration settings.
@@ -514,19 +532,40 @@ def config(rate: Optional[float], no_confirm: bool):
     try:
         transaction_manager = TransactionManager()
 
-        # Check if configuration exists
+        # Check if configuration exists with enhanced error handling
         try:
             existing_config = transaction_manager.db_manager.get_configuration()
             if not existing_config:
                 click.echo("❌ No configuration found. Please run 'saldo setup' first.")
+                click.echo("💡 Use 'saldo setup --help' for setup instructions.")
                 raise click.ClickException("Configuration required")
         except DatabaseError as e:
-            click.echo(f"❌ Database Error: {e}", err=True)
+            if "locked" in str(e).lower():
+                click.echo("❌ Database is currently locked by another process.", err=True)
+                click.echo("💡 Please close other instances of Saldo and try again.", err=True)
+            elif "permission" in str(e).lower() or "access" in str(e).lower():
+                click.echo("❌ Database access denied. Check file permissions.", err=True)
+                click.echo("💡 Ensure you have write access to ~/.saldo/", err=True)
+            elif "disk" in str(e).lower() or "space" in str(e).lower():
+                click.echo("❌ Insufficient disk space for database operation.", err=True)
+                click.echo("💡 Please free up disk space and try again.", err=True)
+            else:
+                click.echo(f"❌ Database Error: {e}", err=True)
+                click.echo("💡 Try restarting the application or check database integrity.", err=True)
             raise click.ClickException(str(e))
 
         # If no rate provided, display current configuration
         if rate is None:
-            config_display = transaction_manager.get_configuration_display()
+            try:
+                config_display = transaction_manager.get_configuration_display()
+            except ConfigurationError as e:
+                click.echo("❌ Configuration Error: Cannot retrieve configuration.", err=True)
+                click.echo("💡 Please run 'saldo setup' to initialize configuration.", err=True)
+                raise click.ClickException(str(e))
+            except DatabaseError as e:
+                click.echo("❌ Database Error: Cannot access configuration.", err=True)
+                click.echo("💡 Please check database connectivity and try again.", err=True)
+                raise click.ClickException(str(e))
             
             click.echo("⚙️  Current Configuration")
             click.echo("=" * 25)
@@ -534,28 +573,56 @@ def config(rate: Optional[float], no_confirm: bool):
             click.echo(f"Initial balance: ₹{config_display['initial_balance']:.2f}")
             click.echo(f"Created: {config_display['created_at']}")
             
-            current_balance = transaction_manager.get_current_balance()
-            if current_balance > 0:
-                click.echo(f"Current balance: ₹{current_balance:.2f} (you owe)")
-            elif current_balance < 0:
-                click.echo(f"Current balance: ₹{abs(current_balance):.2f} (you have credit)")
-            else:
-                click.echo("Current balance: ₹0.00 (all settled)")
+            try:
+                current_balance = transaction_manager.get_current_balance()
+                if current_balance > 0:
+                    click.echo(f"Current balance: ₹{current_balance:.2f} (you owe)")
+                elif current_balance < 0:
+                    click.echo(f"Current balance: ₹{abs(current_balance):.2f} (you have credit)")
+                else:
+                    click.echo("Current balance: ₹0.00 (all settled)")
+            except DatabaseError as e:
+                click.echo("⚠️  Could not retrieve current balance.", err=True)
+                click.echo(f"Database error: {e}", err=True)
             
             click.echo("\n💡 Use 'saldo config --rate <amount>' to update the rate.")
+            click.echo("💡 Example: saldo config --rate 3.50")
             return
 
-        # Validate new rate
-        if rate <= 0:
-            click.echo("❌ Rate must be a positive number.")
-            raise click.ClickException("Invalid rate")
+        # Comprehensive rate validation
+        if not isinstance(rate, (int, float)):
+            click.echo("❌ Rate must be a valid number (e.g., 2.50, 3.75).")
+            click.echo("💡 Examples: --rate 2.50 or --rate 3.00")
+            raise click.ClickException("Invalid rate format")
 
-        # Check for extremely high rates
+        if rate <= 0:
+            click.echo("❌ Rate must be a positive number greater than zero.")
+            click.echo("💡 Example: --rate 2.50")
+            raise click.ClickException("Invalid rate value")
+
+        # Check for extremely small rates (likely input errors)
+        if rate < 0.01:
+            click.echo("❌ Rate seems too small. Minimum rate is ₹0.01.")
+            click.echo("💡 Did you mean a larger amount? Example: --rate 2.50")
+            raise click.ClickException("Rate too small")
+
+        # Check for extremely high rates with enhanced confirmation
         if rate > 1000:
             if not no_confirm:
-                if not click.confirm(
-                    f"⚠️  Rate ₹{rate:.2f} seems very high. Are you sure this is correct?"
-                ):
+                click.echo(f"⚠️  Rate ₹{rate:.2f} seems unusually high.")
+                click.echo("💡 Most ironing services charge between ₹1-50 per item.")
+                if not click.confirm("Are you sure this rate is correct?"):
+                    click.echo("Rate update cancelled.")
+                    return
+            else:
+                # Even with --no-confirm, log a warning for very high rates
+                click.echo(f"⚠️  Warning: Using very high rate of ₹{rate:.2f} per item.")
+
+        # Check for moderately high rates (100-1000) with softer warning
+        elif rate > 100:
+            if not no_confirm:
+                click.echo(f"⚠️  Rate ₹{rate:.2f} is quite high.")
+                if not click.confirm("Is this rate correct?"):
                     click.echo("Rate update cancelled.")
                     return
 
@@ -585,8 +652,30 @@ def config(rate: Optional[float], no_confirm: bool):
                 click.echo("Rate update cancelled.")
                 return
 
-        # Update the rate
-        update_result = transaction_manager.update_rate(rate)
+        # Update the rate with enhanced error handling
+        try:
+            update_result = transaction_manager.update_rate(rate)
+        except ValidationError as e:
+            if "unusually high" in str(e):
+                click.echo("❌ Rate validation failed: Rate is too high.", err=True)
+                click.echo("💡 Please verify the rate amount and try again.", err=True)
+            elif "positive" in str(e):
+                click.echo("❌ Rate validation failed: Rate must be positive.", err=True)
+                click.echo("💡 Example: --rate 2.50", err=True)
+            else:
+                click.echo(f"❌ Rate validation failed: {e}", err=True)
+            raise click.ClickException(str(e))
+        except DatabaseError as e:
+            if "locked" in str(e).lower():
+                click.echo("❌ Cannot update rate: Database is locked.", err=True)
+                click.echo("💡 Please close other instances of Saldo and try again.", err=True)
+            elif "constraint" in str(e).lower():
+                click.echo("❌ Cannot update rate: Invalid rate value.", err=True)
+                click.echo("💡 Rate must be a positive number.", err=True)
+            else:
+                click.echo(f"❌ Failed to update rate: {e}", err=True)
+                click.echo("💡 Please check database connectivity and try again.", err=True)
+            raise click.ClickException(str(e))
         
         # Display success message
         click.echo("\n✅ Rate updated successfully!")
@@ -595,19 +684,29 @@ def config(rate: Optional[float], no_confirm: bool):
         click.echo("🔮 Future transactions will use the new rate.")
 
     except ValidationError as e:
+        # ValidationError already handled above in specific cases, this is fallback
         click.echo(f"❌ Validation Error: {e}", err=True)
+        if "rate" in str(e).lower():
+            click.echo("💡 Please provide a valid positive rate (e.g., --rate 2.50)", err=True)
         raise click.ClickException(str(e))
     except ConfigurationError as e:
+        # ConfigurationError already handled above in specific cases, this is fallback
         click.echo(f"❌ Configuration Error: {e}", err=True)
+        if "not found" in str(e).lower():
+            click.echo("💡 Run 'saldo setup' to initialize your configuration.", err=True)
         raise click.ClickException(str(e))
     except DatabaseError as e:
+        # DatabaseError already handled above in specific cases, this is fallback
         click.echo(f"❌ Database Error: {e}", err=True)
+        click.echo("💡 Please check database connectivity and permissions.", err=True)
         raise click.ClickException(str(e))
     except SaldoError as e:
         click.echo(f"❌ Error: {e}", err=True)
+        click.echo("💡 Please check your input and try again.", err=True)
         raise click.ClickException(str(e))
     except Exception as e:
         click.echo(f"❌ Unexpected error: {e}", err=True)
+        click.echo("💡 Please report this issue if it persists.", err=True)
         raise click.ClickException(f"Unexpected error: {e}")
 
 

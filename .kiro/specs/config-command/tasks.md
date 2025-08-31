@@ -25,7 +25,7 @@
   - Follow existing CLI patterns for option naming and structure
   - _Requirements: 1.1, 2.1, 5.4_
 
-- [ ] 4. Implement configuration display functionality
+- [x] 4. Implement configuration display functionality
 
   - Code the logic to display current configuration when no options provided
   - Format currency values consistently with other commands
@@ -33,7 +33,7 @@
   - Handle missing configuration with appropriate error messages
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 5. Implement rate update functionality with confirmation
+- [x] 5. Implement rate update functionality with confirmation
 
   - Code the rate update logic with user confirmation prompts
   - Display current rate vs new rate before confirmation
@@ -42,7 +42,7 @@
   - Add success messages after rate updates
   - _Requirements: 1.1, 1.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
 
-- [ ] 6. Add comprehensive input validation and error handling
+- [-] 6. Add comprehensive input validation and error handling
 
   - Implement validation for rate format and positive values
   - Add confirmation prompts for extremely high rates
