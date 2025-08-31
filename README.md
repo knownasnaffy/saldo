@@ -201,45 +201,45 @@ Initialize or reconfigure your account settings.
 
 **Options:**
 
-- `--rate FLOAT`: Rate per clothing item
-- `--balance FLOAT`: Initial balance (positive = owed, negative = credit)
+- `-r, --rate FLOAT`: Rate per clothing item
+- `-b, --balance FLOAT`: Initial balance (positive = owed, negative = credit)
 
 **Examples:**
 
 ```bash
-saldo setup                           # Interactive setup
+saldo setup                          # Interactive setup
 saldo setup --rate 3.00 --balance 0  # Set rate to ₹3.00, start with ₹0 balance
 ```
 
-### `saldo add-transaction`
+### `saldo add-transaction` (alias: `saldo add`)
 
 Record a new transaction with items processed and payment made.
 
 **Options:**
 
-- `--items INTEGER`: Number of clothing items
-- `--payment FLOAT`: Payment amount
+- `-i, --items INTEGER`: Number of clothing items
+- `-p, --payment FLOAT`: Payment amount
 
 **Examples:**
 
 ```bash
-saldo add-transaction                    # Interactive entry
+saldo add                                       # Interactive entry
 saldo add-transaction --items 4 --payment 8.00  # 4 items, ₹8.00 payment
 ```
 
-### `saldo balance`
+### `saldo balance` (alias: `saldo bal`)
 
 Display current balance and account information.
 
 **Options:**
 
 - `-d, --detailed`: Show transaction history
-- `--limit INTEGER`: Number of recent transactions to show (default: 10)
+- `-l, --limit INTEGER`: Number of recent transactions to show (default: 10)
 
 **Examples:**
 
 ```bash
-saldo balance                    # Basic balance
+saldo bal                        # Basic balance
 saldo balance --detailed         # With transaction history
 saldo balance -d --limit 20      # Show last 20 transactions
 ```
