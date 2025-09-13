@@ -2,15 +2,17 @@ from setuptools import setup, find_packages
 import re
 import os
 
+
 def get_version():
     """Read version from __init__.py"""
-    init_file = os.path.join(os.path.dirname(__file__), 'saldo', '__init__.py')
-    with open(init_file, 'r') as f:
+    init_file = os.path.join(os.path.dirname(__file__), "saldo", "__init__.py")
+    with open(init_file, "r") as f:
         content = f.read()
     match = re.search(r'__version__ = ["\']([^"\']+)["\']', content)
     if match:
         return match.group(1)
     raise RuntimeError("Unable to find version string.")
+
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()

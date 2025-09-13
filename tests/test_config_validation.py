@@ -23,12 +23,12 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
 
         result = self.runner.invoke(cli, ["config", "--rate", "-2.5"])
@@ -44,12 +44,12 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
 
         result = self.runner.invoke(cli, ["config", "--rate", "0"])
@@ -65,12 +65,12 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
 
         result = self.runner.invoke(cli, ["config", "--rate", "0.005"])
@@ -86,12 +86,12 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
 
         # User declines the confirmation
@@ -109,19 +109,19 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
-        
+
         # Mock successful update
         mock_tm.update_rate.return_value = {
-            'old_rate': 2.50,
-            'new_rate': 1500.0,
-            'updated_at': '2024-01-01 10:00:00'
+            "old_rate": 2.50,
+            "new_rate": 1500.0,
+            "updated_at": "2024-01-01 10:00:00",
         }
 
         result = self.runner.invoke(cli, ["config", "--rate", "1500", "--no-confirm"])
@@ -137,7 +137,7 @@ class TestConfigValidation:
         # Mock TransactionManager to raise DatabaseError
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock database error on configuration retrieval
         mock_tm.db_manager.get_configuration.side_effect = DatabaseError(
             "Database is locked by another process"
@@ -156,7 +156,7 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock no configuration found
         mock_tm.db_manager.get_configuration.return_value = None
 
@@ -174,16 +174,18 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
-        
+
         # Mock ValidationError on update
-        mock_tm.update_rate.side_effect = ValidationError("Rate per item seems unusually high")
+        mock_tm.update_rate.side_effect = ValidationError(
+            "Rate per item seems unusually high"
+        )
 
         result = self.runner.invoke(cli, ["config", "--rate", "3.50", "--no-confirm"])
 
@@ -199,14 +201,14 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
-        
+
         # Mock DatabaseError on update
         mock_tm.update_rate.side_effect = DatabaseError("Database constraint violation")
 
@@ -214,7 +216,10 @@ class TestConfigValidation:
 
         assert result.exit_code != 0
         assert "❌" in result.output
-        assert ("Failed to update rate" in result.output or "Cannot update rate" in result.output)
+        assert (
+            "Failed to update rate" in result.output
+            or "Cannot update rate" in result.output
+        )
         assert "constraint" in result.output.lower()
         assert "💡" in result.output  # Should have helpful tip
 
@@ -224,16 +229,18 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration check passes
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
-        
+
         # Mock ConfigurationError on display
-        mock_tm.get_configuration_display.side_effect = ConfigurationError("Configuration is corrupted")
+        mock_tm.get_configuration_display.side_effect = ConfigurationError(
+            "Configuration is corrupted"
+        )
 
         result = self.runner.invoke(cli, ["config"])
 
@@ -248,23 +255,25 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
-        
+
         # Mock successful configuration display
         mock_tm.get_configuration_display.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
-        
+
         # Mock DatabaseError on balance retrieval
-        mock_tm.get_current_balance.side_effect = DatabaseError("Cannot access transactions")
+        mock_tm.get_current_balance.side_effect = DatabaseError(
+            "Cannot access transactions"
+        )
 
         result = self.runner.invoke(cli, ["config"])
 
@@ -279,19 +288,19 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
-        
+
         # Mock successful update
         mock_tm.update_rate.return_value = {
-            'old_rate': 2.50,
-            'new_rate': 3.50,
-            'updated_at': '2024-01-01 10:00:00'
+            "old_rate": 2.50,
+            "new_rate": 3.50,
+            "updated_at": "2024-01-01 10:00:00",
         }
 
         result = self.runner.invoke(cli, ["config", "--rate", "3.50", "--no-confirm"])
@@ -316,12 +325,12 @@ class TestConfigValidation:
         # Mock TransactionManager
         mock_tm = MagicMock()
         mock_tm_class.return_value = mock_tm
-        
+
         # Mock existing configuration
         mock_tm.db_manager.get_configuration.return_value = {
-            'rate_per_item': 2.50,
-            'initial_balance': 0.0,
-            'created_at': '2024-01-01 10:00:00'
+            "rate_per_item": 2.50,
+            "initial_balance": 0.0,
+            "created_at": "2024-01-01 10:00:00",
         }
 
         # User declines the confirmation
