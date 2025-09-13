@@ -10,6 +10,20 @@ from typing import Optional
 from .transaction_manager import TransactionManager
 from .exceptions import SaldoError, ValidationError, ConfigurationError, DatabaseError
 
+import re
+import os
+
+
+def get_version():
+    """Read version from __init__.py"""
+    init_file = os.path.join(os.path.dirname(__file__), "__init__.py")
+    with open(init_file, "r") as f:
+        content = f.read()
+    match = re.search(r'__version__ = ["\']([^"\']+)["\']', content)
+    if match:
+        return match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
 
 class AliasedGroup(click.Group):
     def get_command(self, ctx, cmd_name):
@@ -29,7 +43,7 @@ class AliasedGroup(click.Group):
 
 
 @click.group(cls=AliasedGroup, context_settings={"help_option_names": ["-h", "--help"]})
-@click.version_option("0.1.0", "-v", "--version", prog_name="saldo")
+@click.version_option(get_version(), "-v", "--version", prog_name="saldo")
 def cli():
     """Saldo - A command-line balance tracking application for ironing service transactions."""
     pass
