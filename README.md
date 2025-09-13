@@ -29,7 +29,7 @@ We recommend installing **Saldo** with [pipx](https://pypa.github.io/pipx/) for 
 * It automatically puts the `saldo` command on your PATH (no need to call `python -m saldo`).
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/knownasnaffy/saldo.git
 cd saldo
 pipx install -e .
 ```
@@ -55,7 +55,7 @@ If you don’t want to use `pipx`, you can install Saldo in a virtual environmen
 1. **Clone the repository:**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/knownasnaffy/saldo.git
    cd saldo
    ```
 
